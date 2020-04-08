@@ -1,0 +1,77 @@
+---
+layout: default
+---
+
+<div class="home">
+  {%- if page.title -%}
+  <h1 class="page-heading">{{ page.title }}</h1>
+  {%- endif -%}
+
+  {% for my_page in site.pages %}
+    {% if my_page.machine_name == "problem" %}
+    <div id="punchline">
+      {{ my_page.excerpt | markdownify }}
+    </div>
+    {% endif %}
+  {% endfor %}
+
+  <div class="cardholder">
+    {%- if site.vendors.size > 0 -%}
+
+    {% assign uniqTitles = site.vendors | map: 'name' | uniq %}
+    {% assign unique_vendors = "" | split: ',' %}
+
+    {% for title in uniqTitles %}
+      {% for vendor in site.vendors %}
+        {% if vendor.name contains title %}
+          {% assign unique_vendors = unique_vendors | push: vendor %}
+          {% break %}
+        {% endif %}
+      {% endfor %}
+    {% endfor %}
+
+    {% assign sorted_vendors = unique_vendors | sort:"position" %}
+
+    {%- for vendor in sorted_vendors -%} {% if vendor.award %}
+      {%- include card-vendor-award.html -%}
+    {%- endif -%} {%- endfor -%}
+
+    {%- for vendor in sorted_vendors -%} {% unless vendor.award %}
+      {%- include card-vendor.html -%}
+    {%- endunless -%} {%- endfor -%}
+
+    {%- endif -%}
+  </div>
+
+</div>
+<script>
+  var cardArr = document.getElementsByClassName("card")
+  var step = (256/cardArr.length)/1.5
+  var r = 255
+
+  Array.from(cardArr).forEach(el => {
+    el.style.backgroundColor = "hsv(" + r/360 + ",0.5,0.5)"
+    r = r - step
+  });
+
+  function hsv(h, s, v) {
+    var r, g, b, i, f, p, q, t;
+    if (arguments.length === 1) {
+        s = h.s, v = h.v, h = h.h;
+    }
+    i = Math.floor(h * 6);
+    f = h * 6 - i;
+    p = v * (1 - s);
+    q = v * (1 - f * s);
+    t = v * (1 - (1 - f) * s);
+    switch (i % 6) {
+        case 0: r = v, g = t, b = p; break;
+        case 1: r = q, g = v, b = p; break;
+        case 2: r = p, g = v, b = t; break;
+        case 3: r = p, g = q, b = v; break;
+        case 4: r = t, g = p, b = v; break;
+        case 5: r = v, g = p, b = q; break;
+    }
+    return rgb(Math.round(r * 255), Math.round(g * 255), Math.round(b * 255));
+  }
+</script>
